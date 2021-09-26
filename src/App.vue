@@ -1,7 +1,8 @@
 <template>
     <div class="container mx-auto flex flex-col items-center bg-gray-100 p-4">
-        <!-- <div
+        <div
             class="fixed w-100 h-100 opacity-80 bg-purple-800 inset-0 z-50 flex items-center justify-center"
+            v-if="loading"
         >
             <svg
                 class="animate-spin -ml-1 mr-3 h-12 w-12 text-white"
@@ -23,7 +24,7 @@
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
             </svg>
-        </div> -->
+        </div>
         <div class="container">
             <section>
                 <div class="flex">
@@ -36,7 +37,7 @@
                         <div class="mt-1 relative rounded-md shadow-md">
                             <input
                                 v-model="ticker"
-                                @keydown.enter="add"
+                                @keydown.enter="addTicker(ticker)"
                                 type="text"
                                 name="wallet"
                                 id="wallet"
@@ -49,32 +50,19 @@
                         >
                             <span
                                 class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+                                v-for="snippet in snippets"
+                                @click="addTicker(snippet)"
                             >
-                                BTC
-                            </span>
-                            <span
-                                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-                            >
-                                DOGE
-                            </span>
-                            <span
-                                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-                            >
-                                BCH
-                            </span>
-                            <span
-                                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-                            >
-                                CHD
+                                {{ snippet }}
                             </span>
                         </div>
-                        <div class="text-sm text-red-600">
+                        <div class="text-sm text-red-600" v-if="hasError">
                             Такой тикер уже добавлен
                         </div>
                     </div>
                 </div>
                 <button
-                    @click="add"
+                    @click="addTicker(ticker)"
                     type="button"
                     class="my-4 inline-flex items-center py-2 px-4 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-full text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                 >
@@ -193,17 +181,25 @@ export default {
     name: "App",
     data() {
         return {
+            loading: true,
             tickerList: null,
             ticker: null,
             tickers: [],
             sel: null,
-            graph: []
+            graph: [],
+            hasError: false,
+            snippets: [],
         };
     },
     methods: {
-        add() {
+        addTicker(tickerName) {
+            if (this.hasError === false && this.tickers.find(t => t.name === tickerName)) {
+                this.hasError = true;
+                return;
+            }
+
             const currentTicker = {
-                name: this.ticker,
+                name: tickerName,
                 price: "-",
             };
 
@@ -247,6 +243,29 @@ export default {
                 (price) => 5 + ((price - minVal) * 95) / (maxVal - minVal)
             );
         },
+    },
+    watch: {
+        ticker(newTicker) {
+            if (this.hasError === true) this.hasError = false
+
+            this.ticker = newTicker.toUpperCase();
+            this.snippets = [];
+            for (let t in window.tickers) {
+                if (this.snippets.length < 4) {
+                    if (window.tickers[t].Symbol.includes(this.ticker)) {
+                        this.snippets.push(t);
+                    }
+                }
+            }
+        }
+    },
+    created() {
+        fetch('https://min-api.cryptocompare.com/data/all/coinlist?summary=true')
+        .then(data => data.json())
+        .then(data => {
+            window.tickers = data.Data;
+            this.loading = false;
+        });
     }
 };
 </script>
