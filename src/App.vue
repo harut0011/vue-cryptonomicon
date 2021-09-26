@@ -102,8 +102,8 @@
                         v-for="t in tickers"
                         :key="t.name"
                         @click="select(t)"
-                        :class="{ 
-                            'border-4': sel === t  
+                        :class="{
+                            'border-4': sel === t,
                         }"
                         class="bg-white overflow-hidden shadow rounded-lg border-purple-800 border-solid cursor-pointer"
                     >
@@ -143,25 +143,24 @@
                 <hr class="w-full border-t border-gray-600 my-4" />
             </template>
             <section v-if="sel" class="relative">
-                <h3
-                    class="text-lg leading-6 font-medium text-gray-900 my-8"
-                >
+                <h3 class="text-lg leading-6 font-medium text-gray-900 my-8">
                     {{ sel.name }} - USD
                 </h3>
                 <div
                     class="flex items-end border-gray-600 border-b border-l h-64"
                 >
-                    <div 
+                    <div
                         v-for="(bar, idx) in normalizeGraph()"
                         :key="idx"
                         :style="{ height: `${bar}%` }"
                         class="bg-purple-800 border w-10"
                     ></div>
                 </div>
-                <button 
+                <button
                     @click="sel = null"
-                    type="button" 
-                    class="absolute top-0 right-0">
+                    type="button"
+                    class="absolute top-0 right-0"
+                >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -191,39 +190,49 @@
 
 <script>
 export default {
-    name: 'App',
+    name: "App",
     data() {
         return {
+            tickerList: null,
             ticker: null,
             tickers: [],
             sel: null,
             graph: []
-        }
+        };
     },
     methods: {
         add() {
             const currentTicker = {
                 name: this.ticker,
-                price: '-'
+                price: "-",
             };
 
             this.tickers.push(currentTicker);
             setInterval(async () => {
-                const f = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=fe133f229a51374ec435294dbf0383677284f23e6082440fed1ff92cf66d3244`);
+                if (currentTicker.name) {
+                    const f = await fetch(
+                        `https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=fe133f229a51374ec435294dbf0383677284f23e6082440fed1ff92cf66d3244`
+                    );
 
-                const data = await f.json();
+                    const data = await f.json();
 
-                this.tickers.find(t => t.name === currentTicker.name).price = data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
+                    this.tickers.find(
+                        (t) => t.name === currentTicker.name
+                    ).price =
+                        data.USD > 1
+                            ? data.USD.toFixed(2)
+                            : data.USD.toPrecision(2);
 
-                if (this.sel?.name === currentTicker.name) {
-                    this.graph.push(data.USD)
+                    if (this.sel?.name === currentTicker.name) {
+                        this.graph.push(data.USD);
+                    }
                 }
             }, 3000);
 
-            this.ticker = '';
+            this.ticker = "";
         },
         handleDelete(tickerToRemove) {
-            this.tickers = this.tickers.filter(t => t !== tickerToRemove);
+            this.tickers = this.tickers.filter((t) => t !== tickerToRemove);
         },
         select(ticker) {
             this.sel = ticker;
@@ -235,11 +244,9 @@ export default {
             const minVal = Math.min(...this.graph);
 
             return this.graph.map(
-                price => 5 + ((price - minVal) * 95) / (maxVal - minVal)
+                (price) => 5 + ((price - minVal) * 95) / (maxVal - minVal)
             );
-        }
+        },
     }
 };
 </script>
-
-<style src="./app.css"></style>
