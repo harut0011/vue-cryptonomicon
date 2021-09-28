@@ -1,536 +1,500 @@
 <template>
-    <div class="bg-gray-100 mx-auto p-4 items-center flex-col container flex">
-        <div
+  <div class="bg-gray-100 mx-auto p-4 items-center flex-col container flex">
+    <div
+      class="
+        bg-purple-800
+        items-center
+        justify-center
+        h-100
+        w-100
+        opacity-80
+        fixed
+        flex
+        inset-0
+        z-50
+      "
+      v-if="loading"
+    >
+      <svg
+        class="text-white animate-spin h-12 w-12 -ml-1 mr-3"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        />
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        />
+      </svg>
+    </div>
+    <div class="container">
+      <section>
+        <div class="flex">
+          <div class="max-w-xs">
+            <label for="wallet" class="font-medium text-gray-700 text-sm block"
+              >Тикер {{ ticker }}</label
+            >
+            <div class="rounded-md mt-1 shadow-md relative">
+              <input
+                v-model="ticker"
+                @keydown.enter="addTicker(ticker)"
+                type="text"
+                name="wallet"
+                id="wallet"
+                class="
+                  text-gray-900
+                  border-gray-300
+                  rounded-md
+                  w-full
+                  block
+                  focus:border-gray-500 focus:outline-none focus:ring-gray-500
+                  pr-10
+                  sm:text-sm
+                "
+                placeholder="Например DOGE"
+              />
+            </div>
+            <div
+              class="bg-white rounded-md p-1 flex-wrap shadow-md flex shadow-md"
+            >
+              <span
+                class="
+                  cursor-pointer
+                  font-medium
+                  text-gray-800 text-xs
+                  bg-gray-300
+                  rounded-md
+                  m-1
+                  px-2
+                  items-center
+                  inline-flex
+                "
+                v-for="snippet in snippets"
+                @click="addTicker(snippet)"
+                :key="snippet"
+                >{{ snippet }}</span
+              >
+            </div>
+            <div class="text-red-600" text-sm v-if="hasError">
+              Такой тикер уже добавлен
+            </div>
+          </div>
+        </div>
+        <button
+          @click="addTicker(ticker)"
+          type="button"
+          class="
+            font-medium
+            leading-4
+            text-sm text-white
+            duration-300
+            transition-colors
+            bg-gray-600
+            border-transparent
+            rounded-full
+            my-4
+            px-4
+            py-2
+            items-center
+            shadow-sm
+            border
+            focus:outline-none
+            focus:ring-2
+            focus:ring-gray-500
+            focus:ring-offset-2
+            hover:bg-gray-700
+            inline-flex
+          "
+        >
+          <!-- Heroicon name: solid/mail -->
+          <svg
+            class="h-6 w-6 -ml-0.5 mr-2"
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            height="30"
+            viewBox="0 0 24 24"
+            fill="#ffffff"
+          >
+            <path
+              d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+            />
+          </svg>
+          Добавить
+        </button>
+      </section>
+      <template v-if="tickers.length > 0">
+        <div class="filter">
+          <div class="filter__btns">
+            <button
+              type="button"
+              class="
+                font-medium
+                leading-4
+                text-sm text-white
+                duration-300
+                transition-colors
+                bg-gray-600
+                border-transparent
+                rounded-full
+                my-4
+                px-4
+                py-2
+                items-center
+                shadow-sm
+                border
+                focus:outline-none
+                focus:ring-2
+                focus:ring-gray-500
+                focus:ring-offset-2
+                hover:bg-gray-700
+                inline-flex
+                mr-3
+              "
+              @click="page > 1 ? page-- : ''"
+              v-if="page > 1"
+            >
+              <svg
+                class="-ml-0.5 mr-1"
+                width="20"
+                height="15"
+                viewBox="0 0 791.966 791.967"
+                xml:space="preserve"
+              >
+                <g>
+                  <g id="_x37_">
+                    <g>
+                      <path
+                        d="M245.454,396.017L617.077,56.579c12.973-12.94,12.973-33.934,0-46.874c-12.973-12.94-34.033-12.94-47.006,0 L174.615,370.896c-6.932,6.899-9.87,16.076-9.408,25.087c-0.462,9.045,2.476,18.188,9.408,25.088l395.456,361.19 c12.973,12.94,34.033,12.94,47.006,0c12.973-12.939,12.973-33.934,0-46.873L245.454,396.017z"
+                        fill="#ffffff"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </svg>
+              Назад
+            </button>
+            <button
+              type="button"
+              class="
+                font-medium
+                leading-4
+                text-sm text-white
+                duration-300
+                transition-colors
+                bg-gray-600
+                border-transparent
+                rounded-full
+                my-4
+                px-4
+                py-2
+                items-center
+                shadow-sm
+                border
+                focus:outline-none
+                focus:ring-2
+                focus:ring-gray-500
+                focus:ring-offset-2
+                hover:bg-gray-700
+                inline-flex
+              "
+              @click="page++"
+              v-if="hasNextPage"
+            >
+              Далее
+              <svg
+                class="-mr-0.5 ml-1"
+                width="20"
+                height="15"
+                viewBox="0 0 792.033 792.033"
+              >
+                <g>
+                  <g id="_x38_">
+                    <g>
+                      <path
+                        d="M617.858,370.896L221.513,9.705c-13.006-12.94-34.099-12.94-47.105,0c-13.006,12.939-13.006,33.934,0,46.874 l372.447,339.438L174.441,735.454c-13.006,12.94-13.006,33.935,0,46.874s34.099,12.939,47.104,0l396.346-361.191 c6.932-6.898,9.904-16.043,9.441-25.087C627.763,386.972,624.792,377.828,617.858,370.896z"
+                        fill="#ffffff"
+                      />
+                    </g>
+                  </g>
+                </g>
+              </svg>
+            </button>
+          </div>
+          <div class="filter__inp">
+            Фильтр
+            <input type="text" v-model="filter" />
+          </div>
+        </div>
+        <hr class="border-gray-600 border-t my-4 w-full" />
+        <dl class="mt-5 gap-5 grid-cols-1 grid sm:grid-cols-3">
+          <div
+            v-for="t in filteredTickers()"
+            :key="t.name"
+            @click="select(t)"
+            :class="{
+              'border-4': sel === t,
+            }"
             class="
-                bg-purple-800
+              cursor-pointer
+              overflow-hidden
+              bg-white
+              border-purple-800 border-solid
+              rounded-lg
+              shadow
+            "
+          >
+            <div class="text-center px-4 py-5 sm:p-6">
+              <dt class="font-medium text-gray-500 text-sm truncate">
+                {{ t.name }} - USD
+              </dt>
+              <dd class="font-semibold text-3xl text-gray-900 mt-1">
+                {{ t.price }}
+              </dd>
+            </div>
+            <div class="border-gray-200 border-t w-full"></div>
+            <button
+              @click.stop="handleDelete(t)"
+              class="
+                font-medium
+                text-gray-500 text-md
+                transition-all
+                bg-gray-100
+                px-4
+                py-4
                 items-center
                 justify-center
-                h-100
-                w-100
-                opacity-80
-                fixed
+                w-full
                 flex
-                inset-0
-                z-50
-            "
-            v-if="loading"
-        >
-            <svg
-                class="text-white animate-spin h-12 w-12 -ml-1 mr-3"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+                focus:outline-none
+                hover:bg-gray-200 hover:opacity-20 hover:text-gray-600
+                sm:px-6
+              "
             >
-                <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                ></circle>
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="#718096"
+                aria-hidden="true"
+              >
                 <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-            </svg>
+                  fill-rule="evenodd"
+                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                /></svg
+              >Удалить
+            </button>
+          </div>
+        </dl>
+        <hr class="border-gray-600 border-t my-4 w-full" />
+      </template>
+      <section v-if="sel" class="relative">
+        <h3 class="font-medium leading-6 text-gray-900 text-lg my-8">
+          {{ sel.name }} - USD
+        </h3>
+        <div class="border-b border-gray-600 border-l items-end h-64 flex">
+          <div
+            v-for="(bar, idx) in normalizeGraph()"
+            :key="idx"
+            :style="{ height: `${bar}%` }"
+            class="bg-purple-800 w-10 border"
+          ></div>
         </div>
-        <div class="container">
-            <section>
-                <div class="flex">
-                    <div class="max-w-xs">
-                        <label
-                            for="wallet"
-                            class="font-medium text-gray-700 text-sm block"
-                            >Тикер {{ ticker }}</label
-                        >
-                        <div class="rounded-md mt-1 shadow-md relative">
-                            <input
-                                v-model="ticker"
-                                @keydown.enter="addTicker(ticker)"
-                                type="text"
-                                name="wallet"
-                                id="wallet"
-                                class="
-                                    text-gray-900
-                                    border-gray-300
-                                    rounded-md
-                                    w-full
-                                    block
-                                    focus:border-gray-500
-                                    focus:outline-none
-                                    focus:ring-gray-500
-                                    pr-10
-                                    sm:text-sm
-                                "
-                                placeholder="Например DOGE"
-                            />
-                        </div>
-                        <div
-                            class="
-                                bg-white
-                                rounded-md
-                                p-1
-                                flex-wrap
-                                shadow-md
-                                flex
-                                shadow-md
-                            "
-                        >
-                            <span
-                                class="
-                                    cursor-pointer
-                                    font-medium
-                                    text-gray-800 text-xs
-                                    bg-gray-300
-                                    rounded-md
-                                    m-1
-                                    px-2
-                                    items-center
-                                    inline-flex
-                                "
-                                v-for="snippet in snippets"
-                                @click="addTicker(snippet)"
-                            >
-                                {{ snippet }}
-                            </span>
-                        </div>
-                        <div class="text-red-600" text-sm v-if="hasError">
-                            Такой тикер уже добавлен
-                        </div>
-                    </div>
-                </div>
-                <button
-                    @click="addTicker(ticker)"
-                    type="button"
-                    class="
-                        font-medium
-                        leading-4
-                        text-sm text-white
-                        duration-300
-                        transition-colors
-                        bg-gray-600
-                        border-transparent
-                        rounded-full
-                        my-4
-                        px-4
-                        py-2
-                        items-center
-                        shadow-sm
-                        border
-                        focus:outline-none
-                        focus:ring-2
-                        focus:ring-gray-500
-                        focus:ring-offset-2
-                        hover:bg-gray-700
-                        inline-flex
-                    "
-                >
-                    <!-- Heroicon name: solid/mail -->
-                    <svg
-                        class="h-6 w-6 -ml-0.5 mr-2"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="30"
-                        height="30"
-                        viewBox="0 0 24 24"
-                        fill="#ffffff"
-                    >
-                        <path
-                            d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-                        ></path>
-                    </svg>
-                    Добавить
-                </button>
-            </section>
-            <template v-if="tickers.length > 0">
-                <div class="filter">
-                    <div class="filter__btns">
-                        <button
-                            type="button"
-                            class="
-                                font-medium
-                                leading-4
-                                text-sm text-white
-                                duration-300
-                                transition-colors
-                                bg-gray-600
-                                border-transparent
-                                rounded-full
-                                my-4
-                                px-4
-                                py-2
-                                items-center
-                                shadow-sm
-                                border
-                                focus:outline-none
-                                focus:ring-2
-                                focus:ring-gray-500
-                                focus:ring-offset-2
-                                hover:bg-gray-700
-                                inline-flex
-                                mr-3
-                            "
-                            @click="page > 1 ? page-- : ''"
-                            v-if="page > 1"
-                        >
-                            <svg
-                                class="-ml-0.5 mr-1"
-                                width="20"
-                                height="15"
-                                viewBox="0 0 791.966 791.967"
-                                xml:space="preserve"
-                            >
-                                <g>
-                                    <g id="_x37_">
-                                        <g>
-                                            <path
-                                                d="M245.454,396.017L617.077,56.579c12.973-12.94,12.973-33.934,0-46.874c-12.973-12.94-34.033-12.94-47.006,0 L174.615,370.896c-6.932,6.899-9.87,16.076-9.408,25.087c-0.462,9.045,2.476,18.188,9.408,25.088l395.456,361.19 c12.973,12.94,34.033,12.94,47.006,0c12.973-12.939,12.973-33.934,0-46.873L245.454,396.017z"
-                                                fill="#ffffff"
-                                            />
-                                        </g>
-                                    </g>
-                                </g>
-                            </svg>
-                            Назад
-                        </button>
-                        <button
-                            type="button"
-                            class="
-                                font-medium
-                                leading-4
-                                text-sm text-white
-                                duration-300
-                                transition-colors
-                                bg-gray-600
-                                border-transparent
-                                rounded-full
-                                my-4
-                                px-4
-                                py-2
-                                items-center
-                                shadow-sm
-                                border
-                                focus:outline-none
-                                focus:ring-2
-                                focus:ring-gray-500
-                                focus:ring-offset-2
-                                hover:bg-gray-700
-                                inline-flex
-                            "
-                            @click="page++"
-                            v-if="hasNextPage"
-                        >
-                            Далее
-                            <svg
-                                class="-mr-0.5 ml-1"
-                                width="20"
-                                height="15"
-                                viewBox="0 0 792.033 792.033"
-                            >
-                                <g>
-                                    <g id="_x38_">
-                                        <g>
-                                            <path
-                                                d="M617.858,370.896L221.513,9.705c-13.006-12.94-34.099-12.94-47.105,0c-13.006,12.939-13.006,33.934,0,46.874 l372.447,339.438L174.441,735.454c-13.006,12.94-13.006,33.935,0,46.874s34.099,12.939,47.104,0l396.346-361.191 c6.932-6.898,9.904-16.043,9.441-25.087C627.763,386.972,624.792,377.828,617.858,370.896z"
-                                                fill="#ffffff"
-                                            />
-                                        </g>
-                                    </g>
-                                </g>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="filter__inp">
-                        Фильтр
-                        <input type="text" v-model="filter" />
-                    </div>
-                </div>
-                <hr class="border-gray-600 border-t my-4 w-full" />
-                <dl class="mt-5 gap-5 grid-cols-1 grid sm:grid-cols-3">
-                    <div
-                        v-for="t in filteredTickers()"
-                        :key="t.name"
-                        @click="select(t)"
-                        :class="{
-                            'border-4': sel === t,
-                        }"
-                        class="
-                            cursor-pointer
-                            overflow-hidden
-                            bg-white
-                            border-purple-800 border-solid
-                            rounded-lg
-                            shadow
-                        "
-                    >
-                        <div class="text-center px-4 py-5 sm:p-6">
-                            <dt
-                                class="
-                                    font-medium
-                                    text-gray-500 text-sm
-                                    truncate
-                                "
-                            >
-                                {{ t.name }} - USD
-                            </dt>
-                            <dd
-                                class="
-                                    font-semibold
-                                    text-3xl text-gray-900
-                                    mt-1
-                                "
-                            >
-                                {{ t.price }}
-                            </dd>
-                        </div>
-                        <div class="border-gray-200 border-t w-full"></div>
-                        <button
-                            @click.stop="handleDelete(t)"
-                            class="
-                                font-medium
-                                text-gray-500 text-md
-                                transition-all
-                                bg-gray-100
-                                px-4
-                                py-4
-                                items-center
-                                justify-center
-                                w-full
-                                flex
-                                focus:outline-none
-                                hover:bg-gray-200
-                                hover:opacity-20
-                                hover:text-gray-600
-                                sm:px-6
-                            "
-                        >
-                            <svg
-                                class="h-5 w-5"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="#718096"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                    clip-rule="evenodd"
-                                ></path></svg
-                            >Удалить
-                        </button>
-                    </div>
-                </dl>
-                <hr class="border-gray-600 border-t my-4 w-full" />
-            </template>
-            <section v-if="sel" class="relative">
-                <h3 class="font-medium leading-6 text-gray-900 text-lg my-8">
-                    {{ sel.name }} - USD
-                </h3>
-                <div
-                    class="
-                        border-b border-gray-600 border-l
-                        items-end
-                        h-64
-                        flex
-                    "
-                >
-                    <div
-                        v-for="(bar, idx) in normalizeGraph()"
-                        :key="idx"
-                        :style="{ height: `${bar}%` }"
-                        class="bg-purple-800 w-10 border"
-                    ></div>
-                </div>
-                <button
-                    @click="sel = null"
-                    type="button"
-                    class="absolute right-0 top-0"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                        xmlns:svgjs="http://svgjs.com/svgjs"
-                        version="1.1"
-                        width="30"
-                        height="30"
-                        x="0"
-                        y="0"
-                        viewBox="0 0 511.76 511.76"
-                        style="enable-background: new 0 0 512 512"
-                        xml:space="preserve"
-                    >
-                        <g>
-                            <path
-                                d="M436.896,74.869c-99.84-99.819-262.208-99.819-362.048,0c-99.797,99.819-99.797,262.229,0,362.048 c49.92,49.899,115.477,74.837,181.035,74.837s131.093-24.939,181.013-74.837C536.715,337.099,536.715,174.688,436.896,74.869z     M361.461,331.317c8.341,8.341,8.341,21.824,0,30.165c-4.16,4.16-9.621,6.251-15.083,6.251c-5.461,0-10.923-2.091-15.083-6.251    l-75.413-75.435l-75.392,75.413c-4.181,4.16-9.643,6.251-15.083,6.251c-5.461,0-10.923-2.091-15.083-6.251    c-8.341-8.341-8.341-21.845,0-30.165l75.392-75.413l-75.413-75.413c-8.341-8.341-8.341-21.845,0-30.165    c8.32-8.341,21.824-8.341,30.165,0l75.413,75.413l75.413-75.413c8.341-8.341,21.824-8.341,30.165,0    c8.341,8.32,8.341,21.824,0,30.165l-75.413,75.413L361.461,331.317z"
-                                fill="#718096"
-                                data-original="#000000"
-                            ></path>
-                        </g>
-                    </svg>
-                </button>
-            </section>
-        </div>
+        <button
+          @click="sel = null"
+          type="button"
+          class="absolute right-0 top-0"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlns:svgjs="http://svgjs.com/svgjs"
+            version="1.1"
+            width="30"
+            height="30"
+            x="0"
+            y="0"
+            viewBox="0 0 511.76 511.76"
+            style="enable-background: new 0 0 512 512"
+            xml:space="preserve"
+          >
+            <g>
+              <path
+                d="M436.896,74.869c-99.84-99.819-262.208-99.819-362.048,0c-99.797,99.819-99.797,262.229,0,362.048 c49.92,49.899,115.477,74.837,181.035,74.837s131.093-24.939,181.013-74.837C536.715,337.099,536.715,174.688,436.896,74.869z     M361.461,331.317c8.341,8.341,8.341,21.824,0,30.165c-4.16,4.16-9.621,6.251-15.083,6.251c-5.461,0-10.923-2.091-15.083-6.251    l-75.413-75.435l-75.392,75.413c-4.181,4.16-9.643,6.251-15.083,6.251c-5.461,0-10.923-2.091-15.083-6.251    c-8.341-8.341-8.341-21.845,0-30.165l75.392-75.413l-75.413-75.413c-8.341-8.341-8.341-21.845,0-30.165    c8.32-8.341,21.824-8.341,30.165,0l75.413,75.413l75.413-75.413c8.341-8.341,21.824-8.341,30.165,0    c8.341,8.32,8.341,21.824,0,30.165l-75.413,75.413L361.461,331.317z"
+                fill="#718096"
+                data-original="#000000"
+              />
+            </g>
+          </svg>
+        </button>
+      </section>
     </div>
+  </div>
 </template>
 <script>
 export default {
-    name: 'App',
-    data() {
-        return {
-            loading: true,
-            tickerList: null,
-            ticker: null,
-            tickers: [],
-            sel: null,
-            graph: [],
-            hasError: false,
-            snippets: [],
-            filter: '',
-            page: 1,
-            hasNextPage: true,
-        };
-    },
-    created() {
-        const windowUrlData = Object.fromEntries(new URL(window.location).searchParams.entries());
+  name: "App",
+  data() {
+    return {
+      loading: true,
+      tickerList: null,
+      ticker: null,
+      tickers: [],
+      sel: null,
+      graph: [],
+      hasError: false,
+      snippets: [],
+      filter: "",
+      page: 1,
+      hasNextPage: true,
+    };
+  },
+  created() {
+    const windowUrlData = Object.fromEntries(
+      new URL(window.location).searchParams.entries()
+    );
 
-        if (windowUrlData.filter) {
-            this.filter = windowUrlData.filter;
+    if (windowUrlData.filter) {
+      this.filter = windowUrlData.filter;
+    }
+
+    if (windowUrlData.page) {
+      this.page = windowUrlData.page;
+    }
+
+    fetch("https://min-api.cryptocompare.com/data/all/coinlist?summary=true")
+      .catch(() => alert("Проверьте ваше интернет подключение"))
+      .then((data) => data.json())
+      .then((data) => {
+        window.tickers = data.Data;
+        this.loading = false;
+      });
+
+    this.tickers = JSON.parse(localStorage.getItem("crypto-list"));
+
+    if (this.tickers) {
+      this.tickers.forEach((ticker) => this.requestInit(ticker.name));
+    }
+  },
+  methods: {
+    filteredTickers() {
+      const start = (this.page - 1) * 6;
+      const end = this.page * 6;
+
+      const filteredTickers = this.tickers.filter((t) =>
+        t.name.includes(this.filter)
+      );
+
+      this.hasNextPage = filteredTickers.length > end;
+
+      return filteredTickers.slice(start, end);
+    },
+    requestInit(tickerName) {
+      const requestInterval = setInterval(async () => {
+        if (this.tickers.find((t) => t.name === tickerName)) {
+          const f = await fetch(
+            `https://min-api.cryptocompare.com/data/price?fsym=${tickerName}&tsyms=USD&api_key=fe133f229a51374ec435294dbf0383677284f23e6082440fed1ff92cf66d3244`
+          );
+
+          const data = await f.json();
+
+          this.tickers.find((t) => t.name === tickerName).price =
+            data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
+
+          if (this.sel?.name === tickerName) {
+            this.graph.push(data.USD);
+          }
+        } else {
+          clearInterval(requestInterval);
         }
+      }, 3000);
+    },
+    addTicker(tickerName) {
+      if (
+        this.hasError === false &&
+        this.tickers.find((t) => t.name === tickerName)
+      ) {
+        this.hasError = true;
+        return;
+      }
 
-        if (windowUrlData.page) {
-            this.page = windowUrlData.page;
+      const currentTicker = {
+        name: tickerName,
+        price: "-",
+      };
+
+      this.tickers.push(currentTicker);
+
+      localStorage.setItem("crypto-list", JSON.stringify(this.tickers));
+
+      this.requestInit(tickerName);
+
+      this.ticker = "";
+    },
+    handleDelete(tickerToRemove) {
+      this.tickers = this.tickers.filter((t) => t !== tickerToRemove);
+      localStorage.setItem("crypto-list", JSON.stringify(this.tickers));
+    },
+    select(ticker) {
+      this.sel = ticker;
+      this.graph = [];
+    },
+
+    normalizeGraph() {
+      const maxVal = Math.max(...this.graph);
+      const minVal = Math.min(...this.graph);
+
+      return this.graph.map(
+        (price) => 5 + ((price - minVal) * 95) / (maxVal - minVal)
+      );
+    },
+  },
+  watch: {
+    filter(newFilter) {
+      this.page = 1;
+      this.filter = newFilter.toUpperCase();
+
+      window.history.pushState(
+        null,
+        document.title,
+        `${window.location.pathname}?filter=${this.filter}&page=${this.page}`
+      );
+    },
+    ticker(newTicker) {
+      if (this.hasError === true) this.hasError = false;
+
+      this.ticker = newTicker.toUpperCase();
+      this.snippets = [];
+      for (let t in window.tickers) {
+        if (this.snippets.length < 4) {
+          if (window.tickers[t].Symbol.includes(this.ticker)) {
+            this.snippets.push(t);
+          }
         }
-
-
-        fetch(
-            'https://min-api.cryptocompare.com/data/all/coinlist?summary=true'
-        )
-            .catch(() => alert('Проверьте ваше интернет подключение'))
-            .then((data) => data.json())
-            .then((data) => {
-                window.tickers = data.Data;
-                this.loading = false;
-            });
-
-        this.tickers = JSON.parse(localStorage.getItem('crypto-list'));
-
-        if (this.tickers) {
-            this.tickers.forEach((ticker) => this.requestInit(ticker.name));
-        }
+      }
     },
-    methods: {
-        filteredTickers() {
-            const start = (this.page - 1) * 6;
-            const end = this.page * 6;
-
-            const filteredTickers = this.tickers.filter((t) =>
-                t.name.includes(this.filter)
-            );
-
-            this.hasNextPage = filteredTickers.length > end;
-
-            return filteredTickers.slice(start, end);
-        },
-        requestInit(tickerName) {
-            const requestInterval = setInterval(async () => {
-                if (this.tickers.find((t) => t.name === tickerName)) {
-                    const f = await fetch(
-                        `https://min-api.cryptocompare.com/data/price?fsym=${tickerName}&tsyms=USD&api_key=fe133f229a51374ec435294dbf0383677284f23e6082440fed1ff92cf66d3244`
-                    );
-
-                    const data = await f.json();
-
-                    this.tickers.find((t) => t.name === tickerName).price =
-                        data.USD > 1
-                            ? data.USD.toFixed(2)
-                            : data.USD.toPrecision(2);
-
-                    if (this.sel?.name === tickerName) {
-                        this.graph.push(data.USD);
-                    }
-                } else {
-                    clearInterval(requestInterval);
-                }
-            }, 3000);
-        },
-        addTicker(tickerName) {
-            if (
-                this.hasError === false &&
-                this.tickers.find((t) => t.name === tickerName)
-            ) {
-                this.hasError = true;
-                return;
-            }
-
-            const currentTicker = {
-                name: tickerName,
-                price: '-',
-            };
-
-            this.tickers.push(currentTicker);
-
-            localStorage.setItem('crypto-list', JSON.stringify(this.tickers));
-
-            this.requestInit(tickerName);
-
-            this.ticker = '';
-        },
-        handleDelete(tickerToRemove) {
-            this.tickers = this.tickers.filter((t) => t !== tickerToRemove);
-            localStorage.setItem('crypto-list', JSON.stringify(this.tickers));
-        },
-        select(ticker) {
-            this.sel = ticker;
-            this.graph = [];
-        },
-
-        normalizeGraph() {
-            const maxVal = Math.max(...this.graph);
-            const minVal = Math.min(...this.graph);
-
-            return this.graph.map(
-                (price) => 5 + ((price - minVal) * 95) / (maxVal - minVal)
-            );
-        },
+    page() {
+      window.history.pushState(
+        null,
+        document.title,
+        `${window.location.pathname}?filter=${this.filter}&page=${this.page}`
+      );
     },
-    watch: {
-        filter(newFilter) {
-            this.page = 1;
-            this.filter = newFilter.toUpperCase();
-
-            window.history.pushState(
-                null,
-                document.title,
-                `${window.location.pathname}?filter=${this.filter}&page=${this.page}`
-            );
-        },
-        ticker(newTicker) {
-            if (this.hasError === true) this.hasError = false;
-
-            this.ticker = newTicker.toUpperCase();
-            this.snippets = [];
-            for (let t in window.tickers) {
-                if (this.snippets.length < 4) {
-                    if (window.tickers[t].Symbol.includes(this.ticker)) {
-                        this.snippets.push(t);
-                    }
-                }
-            }
-        },
-        page() {
-            window.history.pushState(
-                null,
-                document.title,
-                `${window.location.pathname}?filter=${this.filter}&page=${this.page}`
-            );
-        },
-    },
+  },
 };
 </script>
 <style>
 .filter__btns {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 </style>
